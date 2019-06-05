@@ -1,5 +1,5 @@
 # tiles-to-tiff
-Python script for converting XYZ raster tiles for slippy maps to a georeferenced TIFF image. Written for this tutorial: **INSERT LINK HERE**
+Python script for converting XYZ raster tiles for slippy maps to a georeferenced TIFF image. Written for this tutorial: https://dev.to/jimutt/generate-merged-geotiff-imagery-from-web-maps-xyz-tile-servers-with-python-4d13
 
 ## Prerequisites:
 - GDAL
