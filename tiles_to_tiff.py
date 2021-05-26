@@ -45,7 +45,7 @@ def merge_tiles(input_pattern, output_path):
 
 def georeference_raster_tile(x, y, z, path):
     bounds = tile_edges(x, y, z)
-    filename = os.path.splitext(path)
+    filename, extension = os.path.splitext(path)
     gdal.Translate(filename + '.tif',
                    path,
                    outputSRS='EPSG:4326',
