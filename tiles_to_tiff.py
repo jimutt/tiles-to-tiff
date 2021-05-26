@@ -41,7 +41,7 @@ def merge_tiles(input_pattern, output_path):
 
 def georeference_raster_tile(x, y, z, path):
     bounds = tile_edges(x, y, z)
-    filename, extension = os.path.splitext(path)
+    filename = os.path.splitext(path)
     gdal.Translate(filename + '.tif',
                    path,
                    outputSRS='EPSG:4326',
@@ -55,9 +55,13 @@ print(f"Downloading {(x_max - x_min + 1) * (y_max - y_min + 1)} tiles")
 
 for x in range(x_min, x_max + 1):
     for y in range(y_min, y_max + 1):
-        print(f"{x},{y}")
-        png_path = download_tile(x, y, zoom, tile_server)
-        georeference_raster_tile(x, y, zoom, png_path)
+        try:
+            png_path = download_tile(x, y, zoom, tile_server)
+            print(f"{x},{y} fetched")
+            georeference_raster_tile(x, y, zoom, png_path)
+        except OSError:
+            print(f"{x},{y} missing")
+            pass
 
 print("Download complete")
 
