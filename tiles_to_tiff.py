@@ -8,8 +8,12 @@ from tile_convert import bbox_to_xyz, tile_edges
 from osgeo import gdal
 
 #---------- CONFIGURATION -----------#
-tile_server = "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=" + os.environ.get(
-    'MAPBOX_ACCESS_TOKEN')
+# Option 1: Online source
+tile_source = "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=" + os.environ.get('MAPBOX_ACCESS_TOKEN')
+
+# Option 2: Local file system source
+#tile_source = "file:///D:/path_to/local_tiles/{z}/{x}/{y}.png"
+
 temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
 output_dir = os.path.join(os.path.dirname(__file__), 'output')
 zoom = 16
@@ -20,8 +24,8 @@ lat_max = 65.31688
 #-----------------------------------#
 
 
-def download_tile(x, y, z, tile_server):
-    url = tile_server.replace(
+def fetch_tile(x, y, z, tile_source):
+    url = tile_source.replace(
         "{x}", str(x)).replace(
         "{y}", str(y)).replace(
         "{z}", str(z))
@@ -51,19 +55,19 @@ def georeference_raster_tile(x, y, z, path):
 x_min, x_max, y_min, y_max = bbox_to_xyz(
     lon_min, lon_max, lat_min, lat_max, zoom)
 
-print(f"Downloading {(x_max - x_min + 1) * (y_max - y_min + 1)} tiles")
+print(f"Fetching {(x_max - x_min + 1) * (y_max - y_min + 1)} tiles")
 
 for x in range(x_min, x_max + 1):
     for y in range(y_min, y_max + 1):
         try:
-            png_path = download_tile(x, y, zoom, tile_server)
+            png_path = fetch_tile(x, y, zoom, tile_source)
             print(f"{x},{y} fetched")
             georeference_raster_tile(x, y, zoom, png_path)
         except OSError:
             print(f"{x},{y} missing")
             pass
 
-print("Download complete")
+print("Fetching of tiles complete")
 
 print("Merging tiles")
 merge_tiles(temp_dir + '/*.tif', output_dir + '/merged.tif')
