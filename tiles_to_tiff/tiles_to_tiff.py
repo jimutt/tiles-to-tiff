@@ -12,9 +12,13 @@ def fetch_tile(x, y, z, tile_source):
         "{x}", str(x)).replace(
         "{y}", str(y)).replace(
         "{z}", str(z))
+
+    if not tile_source.startswith("http"):
+        return url.replace("file:///", "")
+
     path = f'{temp_dir}/{x}_{y}_{z}.png'
     urllib.request.urlretrieve(url, path)
-    return(path)
+    return path
 
 
 def merge_tiles(input_pattern, output_path):
@@ -25,8 +29,7 @@ def merge_tiles(input_pattern, output_path):
 
 def georeference_raster_tile(x, y, z, path):
     bounds = tile_edges(x, y, z)
-    filename, extension = os.path.splitext(path)
-    gdal.Translate(filename + '.tif',
+    gdal.Translate(os.path.join(temp_dir, f'{temp_dir}/{x}_{y}_{z}.tif'),
                    path,
                    outputSRS='EPSG:4326',
                    outputBounds=bounds)
@@ -44,7 +47,7 @@ def convert(tile_source, output_dir, bounding_box, zoom):
     x_min, x_max, y_min, y_max = bbox_to_xyz(
         lon_min, lon_max, lat_min, lat_max, zoom)
 
-    print(f"Fetching {(x_max - x_min + 1) * (y_max - y_min + 1)} tiles")
+    print(f"Fetching & georeferencing {(x_max - x_min + 1) * (y_max - y_min + 1)} tiles")
 
     for x in range(x_min, x_max + 1):
         for y in range(y_min, y_max + 1):
@@ -53,10 +56,10 @@ def convert(tile_source, output_dir, bounding_box, zoom):
                 print(f"{x},{y} fetched")
                 georeference_raster_tile(x, y, zoom, png_path)
             except OSError:
-                print(f"{x},{y} missing")
+                print(f"Error, failed to get {x},{y}")
                 pass
 
-    print("Fetching of tiles complete")
+    print("Resolving and georeferencing of raster tiles complete")
 
     print("Merging tiles")
     merge_tiles(temp_dir + '/*.tif', output_dir + '/merged.tif')
