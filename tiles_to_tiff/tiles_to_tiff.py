@@ -17,7 +17,16 @@ def fetch_tile(x, y, z, tile_source):
         return url.replace("file:///", "")
 
     path = f'{temp_dir}/{x}_{y}_{z}.png'
-    urllib.request.urlretrieve(url, path)
+    req = urllib.request.Request(
+        url,
+        data=None,
+        headers={
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) tiles-to-tiff/1.0 (+https://github.com/jimutt/tiles-to-tiff)'
+        }
+    )
+    g = urllib.request.urlopen(req)
+    with open(path, 'b+w') as f:
+        f.write(g.read())
     return path
 
 
