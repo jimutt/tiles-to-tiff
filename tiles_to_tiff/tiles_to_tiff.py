@@ -17,7 +17,16 @@ def fetch_tile(x, y, z, tile_source):
         return url.replace("file:///", "")
 
     path = f'{temp_dir}/{x}_{y}_{z}.png'
-    urllib.request.urlretrieve(url, path)
+    req = urllib.request.Request(
+        url,
+        data=None,
+        headers={
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) tiles-to-tiff/1.0 (+https://github.com/jimutt/tiles-to-tiff)'
+        }
+    )
+    g = urllib.request.urlopen(req)
+    with open(path, 'b+w') as f:
+        f.write(g.read())
     return path
 
 
@@ -32,7 +41,8 @@ def georeference_raster_tile(x, y, z, path):
     gdal.Translate(os.path.join(temp_dir, f'{temp_dir}/{x}_{y}_{z}.tif'),
                    path,
                    outputSRS='EPSG:4326',
-                   outputBounds=bounds)
+                   outputBounds=bounds,
+                   rgbExpand='rgb')
 
 def convert(tile_source, output_dir, bounding_box, zoom): 
     lon_min, lat_min, lon_max, lat_max = bounding_box
