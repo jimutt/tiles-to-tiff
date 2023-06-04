@@ -12,9 +12,15 @@ def latlon_to_xyz(lat, lon, z):
     return(tile_count*x, tile_count*y)
 
 
-def bbox_to_xyz(lon_min, lon_max, lat_min, lat_max, z):
+def bbox_to_xyz(lon_min, lon_max, lat_min, lat_max, z, tms):
     x_min, y_max = latlon_to_xyz(lat_min, lon_min, z)
     x_max, y_min = latlon_to_xyz(lat_max, lon_max, z)
+
+    if tms == True:
+        # In TMS, the y origin is at the bottom, so we flip the y tiles:
+        tile_count = pow(2, z)
+        y_min, y_max = tile_count - y_max - 1, tile_count - y_min - 1
+
     return(floor(x_min), floor(x_max),
            floor(y_min), floor(y_max))
 
@@ -40,8 +46,15 @@ def x_to_lon_edges(x, z):
     lon2 = lon1 + unit
     return(lon1, lon2)
 
+def tms_to_xyz(y, max_tiles):
+    return max_tiles - 1 - y
 
-def tile_edges(x, y, z):
+def tile_edges(x, y, z, tms):
+
+    if tms == True:
+        # flip ytile from TMS to XYZ
+        y = tms_to_xyz(y, 2 ** z)
+
     lat1, lat2 = y_to_lat_edges(y, z)
     lon1, lon2 = x_to_lon_edges(x, z)
     return[lon1, lat1, lon2, lat2]

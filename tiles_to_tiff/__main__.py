@@ -2,7 +2,7 @@ import argparse
 from tiles_to_tiff import convert
 
 parser = argparse.ArgumentParser("tiles_to_tiff", "python tiles_to_tiff https://tileserver-url.com/{z}/{x}/{y}.png 21.49147 65.31016 21.5 65.31688 -o output -z 17")
-parser.add_argument("tile_source", type=str, help="Local directory pattern or URL pattern to a slippy maps tile source.", )
+parser.add_argument("tile_source", type=str, help="Local directory pattern or URL pattern to a slippy maps tile source. Ability to use {-y} in the URL to specify a TMS service", )
 parser.add_argument("lng_min", type=float, help="Min longitude of bounding box")
 parser.add_argument("lat_min", type=float, help="Min latitude of bounding box")
 parser.add_argument("lng_max", type=float, help="Max longitude of bounding box")

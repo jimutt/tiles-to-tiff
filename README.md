@@ -24,6 +24,8 @@ Use local tile source:
 python tiles_to_tiff file:///Users/Bob/local-directory 21.49147 65.31016 21.5 65.31688 -o output -z 17
 ```
 
+In the tile source there is the ability to use {-y} in the URL. In TMS, the origin of coordinates is the bottom left corner so the Y coordinate goes up.
+
 ### CLI arguments:
 
 - `lng_min` - Min longitude of bounding box
