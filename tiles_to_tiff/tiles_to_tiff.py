@@ -36,8 +36,8 @@ def merge_tiles(input_pattern, output_path):
     gdal.Translate(output_path, vrt_path)
 
 
-def georeference_raster_tile(x, y, z, path):
-    bounds = tile_edges(x, y, z)
+def georeference_raster_tile(x, y, z, path, tms):
+    bounds = tile_edges(x, y, z, tms)
     gdal.Translate(os.path.join(temp_dir, f'{temp_dir}/{x}_{y}_{z}.tif'),
                    path,
                    outputSRS='EPSG:4326',
@@ -48,6 +48,22 @@ def convert(tile_source, output_dir, bounding_box, zoom):
     lon_min, lat_min, lon_max, lat_max = bounding_box
 
     # Script start:
+
+    # extact {y} from tile_source, if -y then tms is True
+    parts = tile_source.split("/")
+    tms = parts[-1].split(".")[0].strip('{}')
+
+    if tms.startswith("-"):
+        #print("The string starts with '-'")
+        tile_source = tile_source.replace("-", "")
+        tms = True
+        #print(f"tile_source is {tile_source}")
+    else:
+        #print("The string does not start with '-'")
+        tms = False
+
+    #print(f"tms is {tms}") 
+
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
 
@@ -55,7 +71,7 @@ def convert(tile_source, output_dir, bounding_box, zoom):
         os.makedirs(output_dir)
 
     x_min, x_max, y_min, y_max = bbox_to_xyz(
-        lon_min, lon_max, lat_min, lat_max, zoom)
+        lon_min, lon_max, lat_min, lat_max, zoom, tms)
 
     print(f"Fetching & georeferencing {(x_max - x_min + 1) * (y_max - y_min + 1)} tiles")
 
@@ -64,7 +80,7 @@ def convert(tile_source, output_dir, bounding_box, zoom):
             try:
                 png_path = fetch_tile(x, y, zoom, tile_source)
                 print(f"{x},{y} fetched")
-                georeference_raster_tile(x, y, zoom, png_path)
+                georeference_raster_tile(x, y, zoom, png_path, tms)
             except OSError:
                 print(f"Error, failed to get {x},{y}")
                 pass
