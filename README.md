@@ -1,6 +1,6 @@
 ℹ️ If you came here from [the original tutorial](https://dev.to/jimutt/generate-merged-geotiff-imagery-from-web-maps-xyz-tile-servers-with-python-4d13) you will find the corresponding source code in the v1 branch: https://github.com/jimutt/tiles-to-tiff/tree/v1
 
-The master branch has been updated with a small additional to offer a simple CLI.
+The master branch has been updated with a small addition to offer a simple CLI.
 
 # tiles-to-tiff
 Python script for converting XYZ raster tiles for slippy maps to a georeferenced TIFF image. 
